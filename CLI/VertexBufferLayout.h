@@ -1,12 +1,11 @@
+#pragma once
+
 #include <vector>
-#include <iostream>
-
-#ifndef VERTEXBUFFERLAYOUT_H
-#define VERTEXBUFFERLAYOUT_H
-
 #include <GL/glew.h>
-#include "Renderer.h"
 #include <iostream>
+#include "Debug.h"
+
+using namespace std;
 
 struct VertexBufferElement{
   unsigned int type;
@@ -35,12 +34,11 @@ public:
 
   template<typename T>
   void Push(unsigned int count){
-    std::cout << "nespravnej" << std::endl;
+    cout << "nespravnej" << endl;
     ASSERT(false);
   }
 
-  inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
+
+  inline const vector<VertexBufferElement> GetElements() const { return m_Elements; }
   inline unsigned int GetStride() const { return m_Stride; }
 };
-
-#endif

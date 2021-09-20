@@ -1,9 +1,7 @@
-#ifndef VERTEXARRAY_H
-#define VERTEXARRAY_H
+#pragma once
 
-#include "VertexBufferLayout.h"
 #include "VertexBuffer.h"
-#include "Renderer.h"
+#include "VertexBufferLayout.h"
 
 class VertexArray{
 private:
@@ -18,4 +16,3 @@ public:
   void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
 };
 
-#endif

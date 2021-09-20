@@ -1,7 +1,9 @@
+#include <vector>
+#include <iostream>
+
 #ifndef VERTEXBUFFERLAYOUT_H
 #define VERTEXBUFFERLAYOUT_H
 
-#include <vector>
 #include <GL/glew.h>
 #include "Renderer.h"
 #include <iostream>
@@ -33,11 +35,11 @@ public:
 
   template<typename T>
   void Push(unsigned int count){
-    cout << "nespravnej" << endl;
+    std::cout << "nespravnej" << std::endl;
     ASSERT(false);
   }
 
-  inline const vector<VertexBufferElement> GetElements() const { return m_Elements; }
+  inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
   inline unsigned int GetStride() const { return m_Stride; }
 };
 

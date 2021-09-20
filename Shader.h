@@ -1,3 +1,6 @@
+#ifndef SHADER_H_
+#define SHADER_H_
+
 #include <string>
 #include <unordered_map>
 
@@ -29,3 +32,5 @@ private:
 	unsigned int CreateShader(const string& vertexShader, const string& fragmentShader);
 	int GetUniformLocation(const string& name);
 };
+
+#endif

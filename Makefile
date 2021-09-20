@@ -12,7 +12,7 @@ COMPILER_FLAGS =
 LINKER_FLAGS = -lglfw -lGL -lGLU -lrt -lm -ldl -lXrandr -lXinerama -lXcursor -lXext -lXrender -lXfixes -lX11 -lpthread -lxcb -lXau -lXdmcp -lGLEW -lGLU -lGL -lm -ldl -lXdamage -lXxf86vm -lXfixes -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp
 
 #OBJ_NAMEs specifies the name of our *.o
-OBJ_NAMES = Renderer.o Shader.o IndexBuffer.o VertexBufferLayout.o VertexBuffer.o VertexArray.o Application.o
+OBJ_NAMES = Renderer.o Shader.o IndexBuffer.o VertexBuffer.o VertexBufferLayout.o VertexArray.o Application.o
 
 #EXEC_NAME name of executable
 EXEC_NAME = Application

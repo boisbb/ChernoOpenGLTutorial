@@ -2,3 +2,4 @@ Application
 *.o
 .vs*
 *Debug/*
+.vscode*

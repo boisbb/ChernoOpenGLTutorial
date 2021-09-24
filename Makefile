@@ -7,9 +7,10 @@ CFLAGS =
 #LFLAGS specifies the libraries we're linking against
 LFLAGS = -lglfw -lGL -lGLU -lrt -lm -ldl -lXrandr -lXinerama -lXcursor -lXext -lXrender -lXfixes -lX11 -lpthread -lxcb -lXau -lXdmcp -lGLEW -lGLU -lGL -lm -ldl -lXdamage -lXxf86vm -lXfixes -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp
 
-SOURCES=$(wildcard *.cpp)
-SOURCES+=$(wildcard vendor/*/*.cpp)
-OBJECTS=$(patsubst %.cpp, %.o, $(SOURCES))
+SOURCES=$(wildcard src/*.cpp)
+SOURCES+=$(wildcard src/tests/*.cpp)
+SOURCES+=$(wildcard src/vendor/*/*.cpp)
+OBJECTS=$(patsubst src/%.cpp, src/%.o, $(SOURCES))
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $^
@@ -21,4 +22,4 @@ run :
 	./app
 
 clean:
-	rm $(wildcard *.o) $(wildcard vendor/*/*.o) app imgui.ini
+	rm $(wildcard src/*.o) app imgui.ini

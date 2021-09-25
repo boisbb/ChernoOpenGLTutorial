@@ -18,8 +18,8 @@ OBJECTS=$(patsubst src/%.cpp, src/%.o, $(SOURCES))
 app: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $@ $(LFLAGS)
 
-run :
+run:
 	./app
 
 clean:
-	rm $(wildcard src/*.o) app imgui.ini
+	rm $(wildcard src/*.o) $(wildcard src/tests/*.o) app imgui.ini

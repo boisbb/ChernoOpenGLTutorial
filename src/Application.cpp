@@ -20,8 +20,13 @@ http://docs.gl/
 
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
+
 #include "vendor/imgui/imgui.h"
 #include "vendor/imgui/imgui_impl_glfw_gl3.h"
+
+#include "tests/TestClearColor.h"
+#include "tests/TestTexture2D.h"
+#include "tests/TestBatchRendering.h"
 
 
 int main(void)
@@ -57,45 +62,8 @@ int main(void)
 
     cout << glGetString(GL_VERSION) << endl;
     {
-        float positions[] = {
-          -50.0f, -50.0f, 0.0f, 0.0f,
-          50.0f, -50.0f, 1.0f, 0.0f,
-          50.0f, 50.0f, 1.0f, 1.0f,
-          -50.0f, 50.0, 0.0f, 1.0f
-        };
-
-        // Index buffer
-        unsigned int indices[] = {
-          0, 1, 2,
-          2, 3, 0
-        };
-
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-        VertexArray va;
-        VertexBuffer vb(positions, 4 * 4 * sizeof(float));
-
-        VertexBufferLayout layout;
-        layout.Push<float>(2);
-        layout.Push<float>(2);
-        va.AddBuffer(vb, layout);
-        IndexBuffer ib(indices, 6);
-
-        glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-
-        Shader shader("res/shaders/basic.shader");
-        shader.Bind();
-
-        Texture texture("res/textures/cherno.png");
-        texture.Bind();
-        shader.SetUniform1i("u_Texture", 0);
-
-        va.Unbind();
-        vb.Unbind();
-        ib.Unbind();
-        shader.Unbind();
 
         Renderer renderer;
 
@@ -103,51 +71,42 @@ int main(void)
         ImGui_ImplGlfwGL3_Init(window, true);
         ImGui::StyleColorsDark();
 
-        glm::vec3 translationA(200, 200, 0);
-        glm::vec3 translationB(400, 200, 0);
+        test::Test* currentTest = NULL;
+        test::TestMenu* testMenu = new test::TestMenu(currentTest);
+        currentTest = testMenu;
 
-        /* Loop until the user closes the window */
+        testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+        testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
+        testMenu->RegisterTest<test::TestBatchRendering>("Batch Rendering");
+
         while (!glfwWindowShouldClose(window))
         {
-            /* Render here */
+            GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             renderer.Clear();
 
             ImGui_ImplGlfwGL3_NewFrame();
+            if(currentTest){
+                currentTest->OnUpdate(0.0f);
+                currentTest->OnRender();
+                ImGui::Begin("Test");
 
-            {
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-                glm::mat4 mvp = proj * view * model;
-                shader.Bind();
-                shader.SetUniformMat4f("u_MVP", mvp);
-
-                renderer.Draw(va, ib, shader);
+                if (currentTest != testMenu && ImGui::Button("<-")){
+                    delete currentTest;
+                    currentTest = testMenu;
+                }
+                currentTest->OnImGuiRender();
+                ImGui::End();
             }
-
-            {
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
-                glm::mat4 mvp = proj * view * model;
-                shader.Bind();
-                shader.SetUniformMat4f("u_MVP", mvp);
-
-                renderer.Draw(va, ib, shader);
-            }
-
-            {   
-                ImGui::SliderFloat3("Trans A", &translationA.x, 0.0f, 960.0f);
-                ImGui::SliderFloat3("Trans B", &translationB.x, 0.0f, 960.0f);
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            }
-
             ImGui::Render();
             ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
-            /* Swap front and back buffers */
             glfwSwapBuffers(window);
 
-            /* Poll for and process events */
             glfwPollEvents();
         }
-
+        delete currentTest;
+        if (currentTest != testMenu)
+            delete testMenu;
     }
 
     ImGui_ImplGlfwGL3_Shutdown();

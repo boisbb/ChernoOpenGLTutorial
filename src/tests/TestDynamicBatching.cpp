@@ -1,4 +1,4 @@
-#include "TestBatchRendering.h"
+#include "TestDynamicBatching.h"
 #include <GL/glew.h>
 
 #include "../Debug.h"
@@ -8,21 +8,21 @@
 #include "../vendor/imgui/imgui.h"
 namespace test
 {
-    TestBatchRendering::TestBatchRendering() 
+    TestDynamicBatching::TestDynamicBatching() 
         : m_TranslationA(480, 270, 0), m_TranslationB(400, 200, 0),
         m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)),
         m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
     {
         float positions[] = {
-          -100.0f, 0.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
-          0.0f, 100.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
-          -100.0f, 100.0, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f,
+          -100.0f, 0.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 0.0f, 0.0f,
+          0.0f, 0.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 0.0f, 0.0f,
+          0.0f, 100.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 1.0f, 0.0f,
+          -100.0f, 100.0, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 1.0f, 0.0f,
 
-          0.0f, -100.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
-          100.0f, -100.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
-          100.0f, 0.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f,
-          0.0f, 0.0, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f
+          0.0f, -100.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 0.0f, 0.0f, 1.0f,
+          100.0f, -100.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 1.0f, 0.0f, 1.0f,
+          100.0f, 0.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f,
+          0.0f, 0.0, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 0.0f, 1.0f, 1.0f
 
         };
         unsigned int indices[] = {
@@ -37,32 +37,40 @@ namespace test
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
         m_VAO = std::make_unique<VertexArray>();
-        m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 8 * 7 * sizeof(float));
+        m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 8 * 10 * sizeof(float));
         VertexBufferLayout layout;
         layout.Push<float>(3);
         layout.Push<float>(4);
+        layout.Push<float>(2);
+        layout.Push<float>(1);
         m_VAO->AddBuffer(*m_VertexBuffer, layout);
         m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 12);
 
-        m_Shader = std::make_unique<Shader>("res/shaders/batch.shader");
+        m_Shader = std::make_unique<Shader>("res/shaders/batch_texture.shader");
         m_Shader->Bind();
+        m_TextureA = std::make_unique<Texture>("res/textures/cherno.png");
+        m_TextureB = std::make_unique<Texture>("res/textures/phone.png");
         //m_Shader->SetUniform1i("u_Texture", 0);
-        m_Shader->SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+        int samplers[2] = { 0, 1 };
+        m_Shader->SetUniformMat1i("u_Textures", samplers);
     }
     
-    TestBatchRendering::~TestBatchRendering() 
+    TestDynamicBatching::~TestDynamicBatching() 
     {
     }
     
-    void TestBatchRendering::OnUpdate(float deltaTime) 
+    void TestDynamicBatching::OnUpdate(float deltaTime) 
     {
         
     }
     
-    void TestBatchRendering::OnRender() 
+    void TestDynamicBatching::OnRender() 
     {
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
+
+        m_TextureA->Bind();
+        m_TextureB->Bind(1);
 
         Renderer renderer;
         {
@@ -75,7 +83,7 @@ namespace test
         }
     }
     
-    void TestBatchRendering::OnImGuiRender() 
+    void TestDynamicBatching::OnImGuiRender() 
     {
         {   
             ImGui::SliderFloat3("Trans A", &m_TranslationA.x, 0.0f, 960.0f);

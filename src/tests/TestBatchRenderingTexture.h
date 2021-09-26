@@ -9,10 +9,10 @@
 #include "../Texture.h"
 
 namespace test {
-    class TestBatchRendering : public Test{
+    class TestBatchRenderingTexture : public Test{
     public:
-        TestBatchRendering();
-        ~TestBatchRendering();
+        TestBatchRenderingTexture();
+        ~TestBatchRenderingTexture();
 
         void OnUpdate(float deltaTime) override;
         void OnRender() override;
@@ -21,7 +21,8 @@ namespace test {
         std::unique_ptr<VertexArray> m_VAO;
         std::unique_ptr<IndexBuffer> m_IndexBuffer;
         std::unique_ptr<Shader> m_Shader;
-        std::unique_ptr<Texture> m_Texture;
+        std::unique_ptr<Texture> m_TextureA;
+        std::unique_ptr<Texture> m_TextureB;
         std::unique_ptr<VertexBuffer> m_VertexBuffer;
         glm::vec3 m_TranslationA, m_TranslationB;
         glm::mat4 m_Proj, m_View;

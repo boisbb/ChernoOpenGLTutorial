@@ -26,7 +26,8 @@ http://docs.gl/
 
 #include "tests/TestClearColor.h"
 #include "tests/TestTexture2D.h"
-#include "tests/TestBatchRendering.h"
+#include "tests/TestBatchRenderingColor.h"
+#include "tests/TestBatchRenderingTexture.h"
 
 
 int main(void)
@@ -77,7 +78,8 @@ int main(void)
 
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");
         testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
-        testMenu->RegisterTest<test::TestBatchRendering>("Batch Rendering");
+        testMenu->RegisterTest<test::TestBatchRenderingColor>("Batch Rendering Color");
+        testMenu->RegisterTest<test::TestBatchRenderingTexture>("Batch Rendering Texture");
 
         while (!glfwWindowShouldClose(window))
         {

@@ -6,6 +6,8 @@
 #include "../vendor/glm/glm.hpp"
 #include "../vendor/glm/gtc/matrix_transform.hpp"
 #include "../vendor/imgui/imgui.h"
+
+
 namespace test
 {
     TestDynamicBatching::TestDynamicBatching() 
@@ -13,18 +15,7 @@ namespace test
         m_Proj(glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f)),
         m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
     {
-        float positions[] = {
-          -100.0f, 0.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 0.0f, 0.0f,
-          0.0f, 0.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 0.0f, 0.0f,
-          0.0f, 100.0f, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 1.0f, 1.0f, 0.0f,
-          -100.0f, 100.0, 0.0f, 0.18f, 0.6f, 0.96f, 1.0f, 0.0f, 1.0f, 0.0f,
 
-          0.0f, -100.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 0.0f, 0.0f, 1.0f,
-          100.0f, -100.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 1.0f, 0.0f, 1.0f,
-          100.0f, 0.0f, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f,
-          0.0f, 0.0, 0.0f, 1.0f, 0.93f, 0.24f, 1.0f, 0.0f, 1.0f, 1.0f
-
-        };
         unsigned int indices[] = {
           0, 1, 2,
           2, 3, 0,
@@ -37,8 +28,11 @@ namespace test
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
         m_VAO = std::make_unique<VertexArray>();
-        m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 8 * 10 * sizeof(float));
+        //m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 8 * 10 * sizeof(float));
+        m_VertexBuffer = std::make_unique<VertexBuffer>(1000);
         VertexBufferLayout layout;
+
+        // This is very unclean due to random changes in Chernos API at the end of the series - I'm keeping it this way for now
         layout.Push<float>(3);
         layout.Push<float>(4);
         layout.Push<float>(2);
@@ -66,6 +60,20 @@ namespace test
     
     void TestDynamicBatching::OnRender() 
     {
+        // Set dynamic buffer
+        auto q0 = CreateQuad(m_Quad1Position[0], m_Quad1Position[1], 0.0f);
+        auto q1 = CreateQuad(m_Quad2Position[0], m_Quad2Position[1], 1.0f);
+
+        Vertex vertices[8];
+        memcpy(vertices, q0.data(), q0.size() * sizeof(Vertex));
+        memcpy(vertices + q0.size(), q1.data(), q1.size() * sizeof(Vertex));
+
+        m_VertexBuffer->Bind();
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        //
+
+
+
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
@@ -85,9 +93,40 @@ namespace test
     
     void TestDynamicBatching::OnImGuiRender() 
     {
-        {   
-            ImGui::SliderFloat3("Trans A", &m_TranslationA.x, 0.0f, 960.0f);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        }
+        ImGui::SliderFloat3("Trans s", &m_TranslationA.x, 0.0f, 960.0f);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::DragFloat2("Quad1 Position", m_Quad1Position, 10.0f);
+        ImGui::DragFloat2("Quad2 Position", m_Quad2Position, 10.0f);
+    }
+    
+    std::array<Vertex, 4> TestDynamicBatching::CreateQuad(float x, float y, float textureID) 
+    {
+        float size = 100.0f;
+
+        Vertex v0;
+        v0.Position = {x, y, 0.0f};
+        v0.Color = {0.18f, 0.6f, 0.96f, 1.0f};
+        v0.TexCoords = {0.0f, 0.0f};
+        v0.TexID = textureID;
+
+        Vertex v1;
+        v1.Position = {x + size, y, 0.0f};
+        v1.Color = {0.18f, 0.6f, 0.96f, 1.0f};
+        v1.TexCoords = {1.0f, 0.0f};
+        v1.TexID = textureID;
+
+        Vertex v2;
+        v2.Position = {x + size, y + size, 0.0f};
+        v2.Color = {0.18f, 0.6f, 0.96f, 1.0f};
+        v2.TexCoords = {1.0f, 1.0f};
+        v2.TexID = textureID;
+
+        Vertex v3;
+        v3.Position = {x, y + size, 0.0f};
+        v3.Color = {0.18f, 0.6f, 0.96f, 1.0f};
+        v3.TexCoords = {0.0f, 1.0f};
+        v3.TexID = textureID;
+
+        return { v0, v1, v2, v3 };
     }
 }

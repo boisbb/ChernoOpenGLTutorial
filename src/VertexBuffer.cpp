@@ -1,10 +1,19 @@
 #include "VertexBuffer.h"
 #include "Debug.h"
 
+#include <iostream>
+
 VertexBuffer::VertexBuffer(const void* data, unsigned int size){
   GLCall(glGenBuffers(1, &m_RendererID));
   GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
   GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+}
+
+VertexBuffer::VertexBuffer(unsigned int count) 
+{
+  GLCall(glGenBuffers(1, &m_RendererID));
+  GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+  GLCall(glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW));
 }
 
 VertexBuffer::~VertexBuffer(){

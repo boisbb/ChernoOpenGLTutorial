@@ -37,7 +37,7 @@ namespace test
 
         m_Shader = std::make_unique<Shader>("res/shaders/basic.shader");
         m_Shader->Bind();
-        m_Texture = std::make_unique<Texture>("res/textures/cherno.png");
+        m_Texture = std::make_unique<Texture>("res/textures/pop_cat.png");
         m_Shader->SetUniform1i("u_Texture", 0);
     }
     

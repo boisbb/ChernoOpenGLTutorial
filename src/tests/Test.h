@@ -4,6 +4,9 @@
 #include <vector>
 #include <iostream>
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 namespace test {
     
     class Test{
@@ -28,6 +31,14 @@ namespace test {
 
             m_Tests.push_back(std::make_pair(name, []() { return new T(); }));
         }
+
+        template<typename T>
+        void RegisterTest(const std::string& name, GLFWwindow* window){
+            std::cout << "Registering test " << name << std::endl;
+
+            m_Tests.push_back(std::make_pair(name, [window]() { return new T(window); }));
+        }
+        
     private:
         Test*& m_CurrentTest;
         std::vector<std::pair<std::string, std::function<Test*()>>> m_Tests;

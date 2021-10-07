@@ -29,6 +29,11 @@ http://docs.gl/
 #include "tests/TestBatchRenderingColor.h"
 #include "tests/TestBatchRenderingTexture.h"
 #include "tests/TestDynamicBatching.h"
+#include "tests/TestPyramid.h"
+#include "tests/TestPlane.h"
+
+#define WIDTH 800
+#define HEIGHT 800
 
 
 int main(void)
@@ -45,7 +50,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -64,8 +69,8 @@ int main(void)
 
     cout << glGetString(GL_VERSION) << endl;
     {
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        GLCall(glEnable(GL_DEPTH_TEST));
+
 
         Renderer renderer;
 
@@ -82,6 +87,10 @@ int main(void)
         testMenu->RegisterTest<test::TestBatchRenderingColor>("Batch Rendering Color");
         testMenu->RegisterTest<test::TestBatchRenderingTexture>("Batch Rendering Texture");
         testMenu->RegisterTest<test::TestDynamicBatching>("Dynamic Batching");
+        testMenu->RegisterTest<test::TestPyramid>("Pyramid", window);
+        testMenu->RegisterTest<test::TestPlane>("Plane", window);
+
+        GLCall(glViewport(0,0, WIDTH, HEIGHT));
 
         while (!glfwWindowShouldClose(window))
         {
@@ -92,14 +101,12 @@ int main(void)
             if(currentTest){
                 currentTest->OnUpdate(0.0f);
                 currentTest->OnRender();
-                ImGui::Begin("Test");
 
-                if (currentTest != testMenu && ImGui::Button("<-")){
+                if (currentTest != testMenu && glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS){
                     delete currentTest;
                     currentTest = testMenu;
                 }
                 currentTest->OnImGuiRender();
-                ImGui::End();
             }
             ImGui::Render();
             ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());

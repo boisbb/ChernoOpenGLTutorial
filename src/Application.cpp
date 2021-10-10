@@ -28,7 +28,6 @@ http://docs.gl/
 #include "tests/TestTexture2D.h"
 #include "tests/TestBatchRenderingColor.h"
 #include "tests/TestBatchRenderingTexture.h"
-#include "tests/TestDynamicBatching.h"
 #include "tests/TestPyramid.h"
 #include "tests/TestPlane.h"
 
@@ -86,7 +85,6 @@ int main(void)
         testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
         testMenu->RegisterTest<test::TestBatchRenderingColor>("Batch Rendering Color");
         testMenu->RegisterTest<test::TestBatchRenderingTexture>("Batch Rendering Texture");
-        testMenu->RegisterTest<test::TestDynamicBatching>("Dynamic Batching");
         testMenu->RegisterTest<test::TestPyramid>("Pyramid", window);
         testMenu->RegisterTest<test::TestPlane>("Plane", window);
 

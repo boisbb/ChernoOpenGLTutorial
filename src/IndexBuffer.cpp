@@ -9,6 +9,13 @@ IndexBuffer::IndexBuffer(const unsigned int* data, unsigned int count) : m_Count
   GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW));
 }
 
+IndexBuffer::IndexBuffer(std::vector<unsigned int>& indices) 
+{
+  GLCall(glGenBuffers(1, &m_RendererID));
+  GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID));
+  GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW));
+}
+
 IndexBuffer::~IndexBuffer(){
   GLCall(glDeleteBuffers(1, &m_RendererID));
 }

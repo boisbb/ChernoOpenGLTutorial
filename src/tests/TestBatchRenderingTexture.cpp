@@ -49,7 +49,7 @@ namespace test
         m_Shader = std::make_unique<Shader>("res/shaders/batch_texture.shader");
         m_Shader->Bind();
         m_TextureA = std::make_unique<Texture>("res/textures/cherno.png");
-        m_TextureB = std::make_unique<Texture>("res/textures/phone.png");
+        m_TextureB = std::make_unique<Texture>("res/textures/phone.png", GL_TEXTURE_2D, 1, GL_RGBA, GL_UNSIGNED_BYTE);
         //m_Shader->SetUniform1i("u_Texture", 0);
         int samplers[2] = { 0, 1 };
         m_Shader->SetUniformMat1i("u_Textures", samplers);
@@ -70,7 +70,7 @@ namespace test
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
         m_TextureA->Bind();
-        m_TextureB->Bind(1);
+        m_TextureB->Bind();
 
         Renderer renderer;
         {

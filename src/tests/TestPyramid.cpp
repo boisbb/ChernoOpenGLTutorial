@@ -91,7 +91,7 @@ namespace test
 
         m_Shader = std::make_unique<Shader>("res/shaders/stream.shader");
 
-        m_Texture = std::make_unique<Texture>("res/textures/brick.png", GL_TEXTURE_2D, GL_RGBA, GL_UNSIGNED_BYTE);
+        m_Texture = std::make_unique<Texture>("res/textures/brick.png");
 
         m_Camera = std::make_unique<Camera>(WIDTH, HEIGHT, glm::vec3(0.0f, 0.0f, 2.0f));
         /*----------------------------*/
@@ -196,36 +196,5 @@ namespace test
     void TestPyramid::SetWindow(GLFWwindow* window) 
     {
         m_Window = window;
-    }
-
-    std::array<Vertex, 4> TestPyramid::CreateQuad(float x, float y, float textureID) 
-    {
-        float size = 1.0f;
-
-        Vertex v0;
-        v0.Position = {x, y, 0.0f};
-        v0.Color = {1.0f, 0.0f, 0.0f, 1.0f};
-        v0.TexCoords = {0.0f, 0.0f};
-        v0.TexID = textureID;
-
-        Vertex v1;
-        v1.Position = {x + size, y, 0.0f};
-        v1.Color = {0.0f, 1.0f, 0.0f, 1.0f};
-        v1.TexCoords = {1.0f, 0.0f};
-        v1.TexID = textureID;
-
-        Vertex v2;
-        v2.Position = {x + size, y + size, 0.0f};
-        v2.Color = {0.0f, 0.0f, 1.0f, 1.0f};
-        v2.TexCoords = {1.0f, 1.0f};
-        v2.TexID = textureID;
-
-        Vertex v3;
-        v3.Position = {x, y + size, 0.0f};
-        v3.Color = {1.0f, 1.0f, 1.0f, 1.0f};
-        v3.TexCoords = {0.0f, 1.0f};
-        v3.TexID = textureID;
-
-        return { v0, v1, v2, v3 };
     }
 }

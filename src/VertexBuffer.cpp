@@ -9,11 +9,11 @@ VertexBuffer::VertexBuffer(const void* data, unsigned int size){
   GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 }
 
-VertexBuffer::VertexBuffer(unsigned int count) 
+VertexBuffer::VertexBuffer(std::vector<Vertex>& vertices) 
 {
   GLCall(glGenBuffers(1, &m_RendererID));
   GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
-  GLCall(glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW));
+  GLCall(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW));
 }
 
 VertexBuffer::~VertexBuffer(){

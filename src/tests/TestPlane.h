@@ -8,6 +8,7 @@
 #include "../VertexBufferLayout.h"
 #include "../Texture.h"
 #include "../Camera.h"
+#include "../Mesh.h"
 
 
 #include <GL/glew.h>
@@ -44,7 +45,13 @@ namespace test {
         std::unique_ptr<Texture> m_Texture;
         std::unique_ptr<Texture> m_SpecularTexture;
 
+        Mesh *m_Floor;
+        Mesh *m_LightSource;
+
+        Texture *m_FloorTexture;
+
+        std::vector<Texture> texts;
         float t_Rotation = 0.0f;
-        std::array<Vertex, 4> CreateQuad(float x, float y, float textureID);
+        //std::array<Vertex, 4> CreateQuad(float x, float y, float textureID);
     };
 }

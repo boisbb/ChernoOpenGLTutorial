@@ -14,31 +14,36 @@ namespace test
     TestPlane::TestPlane(GLFWwindow* window)
         : m_Window(window)
     {
-        float vertices[] =
-        { //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-            -1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
-            -1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-             1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-             1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f
+        // Vertices coordinates
+        Vertex vertices[] = 
+        {
+            Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+            Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+            Vertex{glm::vec3( 1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+            Vertex{glm::vec3( 1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
         };
 
-        unsigned int indices[] = {
-            0, 1, 2, // Bottom side
+        // Indices for vertices order
+        unsigned int indices[] =
+        {
+            0, 1, 2,
             0, 2, 3
         };
 
-        float lightVertices[] = {
-            -0.1f, -0.1f,  0.1f,
-            -0.1f, -0.1f, -0.1f,
-             0.1f, -0.1f, -0.1f,
-             0.1f, -0.1f,  0.1f,
-            -0.1f,  0.1f,  0.1f,
-            -0.1f,  0.1f, -0.1f,
-             0.1f,  0.1f, -0.1f,
-             0.1f,  0.1f,  0.1f
+        Vertex lightVertices[] =
+        { //     COORDINATES     //
+            Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
+            Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
+            Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
+            Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
+            Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
+            Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
+            Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
+            Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
         };
 
-        unsigned int lightIndices[] = {
+        unsigned int lightIndices[] =
+        {
             0, 1, 2,
             0, 2, 3,
             0, 4, 7,
@@ -52,41 +57,68 @@ namespace test
             4, 5, 6,
             4, 6, 7
         };
-
         //auto quad0 = CreateQuad(-0.5, -0.5, 0.0);
 
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-        // THIS IS FOR PYRAMID OBJECT //
+        // THIS IS FOR OBJECT //
+        std::vector<Vertex> verts(vertices, vertices + sizeof(vertices) / sizeof(Vertex));
+        std::vector<unsigned int> ind(indices, indices + sizeof(indices) / sizeof(unsigned int));
+
+        m_Floor = new Mesh(verts, ind);
+        //m_Floor->AddTexture("res/textures/planks.png", 0, "diffuse", GL_RGBA, GL_UNSIGNED_BYTE);
+        m_FloorTexture = new Texture("res/textures/planks.png", 0, "diffuse", GL_RGBA, GL_UNSIGNED_BYTE);
+        m_Floor->AddTexture(m_FloorTexture);
+        m_Floor->AddTexture("res/textures/planksSpec.png", 1, "specular", GL_RED, GL_UNSIGNED_BYTE);
+
+
+        //------
+        
+        /*
         m_VAO = std::make_unique<VertexArray>();
-        m_VertexBuffer = std::make_unique<VertexBuffer>(vertices, 11 * 16 * sizeof(float));
+        m_VertexBuffer = std::make_unique<VertexBuffer>(verts);
         VertexBufferLayout layout;
         layout.Push<float>(3);
         layout.Push<float>(3);
-        layout.Push<float>(2);
         layout.Push<float>(3);
+        layout.Push<float>(2);
         m_VAO->AddBuffer(*m_VertexBuffer, layout);
-        m_IndexBuffer = std::make_unique<IndexBuffer>(indices, sizeof(indices)/sizeof(int));
+        m_IndexBuffer = std::make_unique<IndexBuffer>(ind);
 
         m_Shader = std::make_unique<Shader>("res/shaders/stream.shader");
 
-        m_Texture = std::make_unique<Texture>("res/textures/planks.png", GL_TEXTURE_2D, GL_RGBA, GL_UNSIGNED_BYTE);
-        m_SpecularTexture = std::make_unique<Texture>("res/textures/planksSpec.png", GL_TEXTURE_2D, GL_RGB, GL_UNSIGNED_BYTE);
+        m_Texture = std::make_unique<Texture>("res/textures/planks.png", 0, GL_TEXTURE_2D, GL_RGBA, GL_UNSIGNED_BYTE);
+        m_SpecularTexture = std::make_unique<Texture>("res/textures/planksSpec.png", 1, GL_TEXTURE_2D, GL_RGB, GL_UNSIGNED_BYTE);
+        */
+
+        //m_Texture = std::make_unique<Texture>("res/textures/planks.png", 0, GL_TEXTURE_2D, GL_RGBA, GL_UNSIGNED_BYTE);
+        //m_SpecularTexture = std::make_unique<Texture>("res/textures/planksSpec.png", 1, GL_TEXTURE_2D, GL_RGB, GL_UNSIGNED_BYTE);
         
+
+        m_Shader = std::make_unique<Shader>("res/shaders/stream.shader");
         
         m_Camera = std::make_unique<Camera>(WIDTH, HEIGHT, glm::vec3(0.0f, 0.0f, 2.0f));
         /*----------------------------*/
 
+
         // THIS IS FOR LIGHT SOURCE //
+        std::vector<Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
+        std::vector<unsigned int> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(unsigned int));
+
+        m_LightSource = new Mesh(lightVerts, lightInd);
+
+        //---
+        
+        /*
         m_LightVAO = std::make_unique<VertexArray>();
         
-        m_LightVertexBuffer = std::make_unique<VertexBuffer>(lightVertices, 8 * 3 * sizeof(float));
+        m_LightVertexBuffer = std::make_unique<VertexBuffer>(lightVerts);
         VertexBufferLayout LightLayout;
         LightLayout.Push<float>(3);
         m_LightVAO->AddBuffer(*m_LightVertexBuffer, LightLayout);
 
-        m_LightIndexBuffer = std::make_unique<IndexBuffer>(lightIndices, sizeof(lightIndices)/sizeof(int));
+        m_LightIndexBuffer = std::make_unique<IndexBuffer>(lightInd);
 
         m_LightShader = std::make_unique<Shader>("res/shaders/light.shader");
         m_LightShader->Bind();
@@ -94,14 +126,21 @@ namespace test
         m_LightVAO->Unbind();
         m_LightVertexBuffer->Unbind();
         m_LightIndexBuffer->Unbind();
-        /*--------------------------*/
+        */
+        
+
+        m_LightShader = std::make_unique<Shader>("res/shaders/light.shader");
 
         glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        /*--------------------------*/
 
-        // POSITIONS OF PYRAMID AND LIGHT SOURCE //
-        glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::mat4 pyramidModel = glm::mat4(1.0f);
-        pyramidModel = glm::translate(pyramidModel, pyramidPos);
+        std::cout << "after" << std::endl;
+
+        // POSITIONS OF OBJECT AND LIGHT SOURCE //
+        glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::mat4 objectModel = glm::mat4(1.0f);
+        objectModel = glm::translate(objectModel, objectPos);
 
         glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
         glm::mat4 lightModel = glm::mat4(1.0f);
@@ -113,9 +152,10 @@ namespace test
         m_LightShader->SetUniform4f("u_LightColor", lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 
         m_Shader->Bind();
-        m_Shader->SetUniformMat4f("u_ModelMatrix", pyramidModel);
+        m_Shader->SetUniformMat4f("u_ModelMatrix", objectModel);
         m_Shader->SetUniform4f("u_LightColor", lightColor.x, lightColor.y, lightColor.z, lightColor.w);
         m_Shader->SetUniform3f("u_LightPosition", lightPos.x, lightPos.y, lightPos.z);
+
     }
     
     TestPlane::~TestPlane() 
@@ -150,11 +190,14 @@ namespace test
 
         m_Camera->Input(m_Window);
         m_Camera->updateMatrix(45.0f, 0.1f, 100.0f);
-        Renderer renderer;
 
-        m_Texture->Bind();
-        m_SpecularTexture->Bind(1);
+        
+        //Renderer renderer;
 
+        //m_Texture->Bind();
+        //m_SpecularTexture->Bind();
+        
+        /*
         {
             m_Shader->Bind();
             glm::vec3 camPos = m_Camera->GetPosition();
@@ -168,6 +211,10 @@ namespace test
             m_Camera->Matrix(*m_LightShader, "u_CameraMatrix");
             renderer.Draw(*m_LightVAO, *m_LightIndexBuffer, *m_LightShader);
         }
+        */
+
+        m_Floor->Draw(*m_Shader, *m_Camera);
+        m_LightSource->Draw(*m_LightShader, *m_Camera);
 
     }
     
@@ -181,6 +228,7 @@ namespace test
         m_Window = window;
     }
 
+    /*
     std::array<Vertex, 4> TestPlane::CreateQuad(float x, float y, float textureID) 
     {
         float size = 1.0f;
@@ -211,4 +259,5 @@ namespace test
 
         return { v0, v1, v2, v3 };
     }
+    */
 }

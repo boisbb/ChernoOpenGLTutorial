@@ -1,34 +1,25 @@
 #pragma once
 
 #include <array>
+#include <vector>
 
-struct Vec2{
-  float x, y;
+#include "vendor/glm/glm.hpp"
+
+
+struct Vertex
+{
+  glm::vec3 position;
+  glm::vec3 normal;
+  glm::vec3 color;
+  glm::vec2 texUV;
 };
-
-struct Vec3{
-  float x, y, z;
-};
-
-struct Vec4{
-  float x, y, z, w;
-};
-
-
-struct Vertex{
-  Vec3 Position;
-  Vec4 Color;
-  Vec2 TexCoords;
-  float TexID;
-};
-
 
 class VertexBuffer{
 private:
   unsigned int m_RendererID;
 public:
   VertexBuffer(const void* data, unsigned int count);
-  VertexBuffer(unsigned int size);
+  VertexBuffer(std::vector<Vertex>& vertices);
   ~VertexBuffer();
 
   void Bind() const;
